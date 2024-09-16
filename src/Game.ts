@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { SceneManager } from './managers/SceneManager';
+import { InputManager } from './managers/InputManager'
 import { Scene1 } from './scenes/Scene1';
 import { Scene2 } from './scenes/Scene2';
 
@@ -10,7 +11,9 @@ export class Game {
   delta = 0;
   interval = 1 / 60;
   sceneManager = new SceneManager();
+  inputManager!: InputManager;
   rootElement!: HTMLElement;
+  private isFocused: boolean = true;
 
   initThreeRenderer = () => {
     if (!this.rootElement) {
@@ -40,17 +43,26 @@ export class Game {
     this.renderer = this.initThreeRenderer();
 
     this.sceneManager = new SceneManager();
-
+    this.inputManager = new InputManager();
     const resizeObserver = new ResizeObserver(() => {
       this.onWindowResize();
     });
     resizeObserver.observe(this.rootElement);
 
-    document.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('blur', this.onWindowBlur);
+    window.addEventListener('focus', this.onWindowFocus);
 
     this.update();
   }
 
+  private onWindowBlur = () => {
+    this.isFocused = false;
+    this.inputManager.clear()
+  };
+
+  private onWindowFocus = () => {
+    this.isFocused = true;
+  };
 
   onWindowResize = () => {
     const width = this.rootElement.clientWidth;
@@ -77,13 +89,6 @@ export class Game {
     }
   };
 
-  onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === '1') {
-      this.sceneManager.setScene(new Scene1(this));
-    } else if (event.key === '2') {
-      this.sceneManager.setScene(new Scene2(this));
-    }
-  };
 
   // Animation loop
   update = () => {

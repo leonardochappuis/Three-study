@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Scene } from '../interfaces/Scene';
 import { Game } from '../Game';
+import { Scene2 } from './Scene2';
 
 export class Scene1 implements Scene {
   threeScene: THREE.Scene;
@@ -70,8 +71,23 @@ export class Scene1 implements Scene {
 
   update(dt: number) {
     if (!this.cube) return;
-    this.cube.rotation.x += dt;
-    this.cube.rotation.z += dt;
+
+    // Check for input and move the cube
+    if (this.game.inputManager.isKeyPressed('ArrowRight') || this.game.inputManager.isKeyPressed('D') || this.game.inputManager.isKeyPressed('d')) {
+      this.cube.position.x += dt * 2;
+    }
+    if (this.game.inputManager.isKeyPressed('ArrowLeft') || this.game.inputManager.isKeyPressed('A') || this.game.inputManager.isKeyPressed('a')) {
+      this.cube.position.x -= dt * 2;
+    }
+    if (this.game.inputManager.isKeyPressed('ArrowUp') || this.game.inputManager.isKeyPressed('W') || this.game.inputManager.isKeyPressed('w')) {
+      this.cube.position.z -= dt * 2;
+    }
+    if (this.game.inputManager.isKeyPressed('ArrowDown') || this.game.inputManager.isKeyPressed('S') || this.game.inputManager.isKeyPressed('s')) {
+      this.cube.position.z += dt * 2;
+    }
+    if (this.game.inputManager.isKeyPressed('Enter')) {
+      this.game.sceneManager.setScene(new Scene2(this.game))
+    }
   }
 
   render(dt: number) {
